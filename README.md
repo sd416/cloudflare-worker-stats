@@ -1,6 +1,6 @@
 # cf-usage-graph
 
-[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sd416/sd416-CF-usage-graph)
+[![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sd416/cloudflare-worker-stats)
 
 A Cloudflare Worker that generates a dynamic SVG bar chart showing the last 7 days of traffic from the Cloudflare Analytics API. Designed for embedding in a GitHub profile README.
 
