@@ -1,0 +1,54 @@
+<svg width="480" height="160" viewBox="0 0 480 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dotGrid" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="var(--grid-color, #30363d)"/>
+    </pattern>
+    <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="100%">
+      <stop offset="0%" stop-color="#F6821F"/>
+      <stop offset="100%" stop-color="#FBAD66"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <style>
+      :root { --bg: #0d1117; --grid-color: #30363d; --text-p: #ffffff; --text-s: #768390; --brd: #30363d; }
+      @media (prefers-color-scheme: light) {
+        :root { --bg: #ffffff; --grid-color: #d0d7de; --text-p: #24292f; --text-s: #57606a; --brd: #d0d7de; }
+      }
+      .mono { font-family: ui-monospace, SFMono-Regular, monospace; }
+      .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="480" height="160" rx="12" fill="var(--bg)"/>
+  <rect width="480" height="160" rx="12" fill="url(#dotGrid)"/>
+  <rect x="0.5" y="0.5" width="479" height="159" rx="11.5" stroke="var(--brd)" fill="none"/>
+  <path d="M 400 0 L 480 0 L 480 60" stroke="#F6821F" stroke-width="2" fill="none" opacity="0.6"/>
+
+  <g transform="translate(25, 35)">
+    <text class="mono" font-size="12" fill="#F6821F" font-weight="bold" letter-spacing="2">SYSTEM.STATUS: <tspan fill="#22c55e">ONLINE</tspan></text>
+    <text y="45" class="sans" font-size="42" font-weight="800" fill="var(--text-p)" filter="url(#glow)">144.6K</text>
+    <text y="70" class="mono" font-size="11" fill="var(--text-s)">WEBSITE TRAFFIC / LAST 7 DAYS</text>
+  </g>
+
+  <g transform="translate(280, 50)">
+    <text x="-5" y="15" class="mono" font-size="8" fill="var(--text-s)" text-anchor="end">31.2K</text>
+      <text x="-5" y="80" class="mono" font-size="8" fill="var(--text-s)" text-anchor="end">12.4K</text>
+    <rect x="0" y="70" width="18" height="10" rx="3" fill="url(#barGrad)" opacity="0.40"/>
+      <rect x="25" y="51.48936170212766" width="18" height="28.51063829787234" rx="3" fill="url(#barGrad)" opacity="0.50"/>
+      <rect x="50" y="60.74468085106383" width="18" height="19.25531914893617" rx="3" fill="url(#barGrad)" opacity="0.60"/>
+      <rect x="75" y="39.04255319148936" width="18" height="40.95744680851064" rx="3" fill="url(#barGrad)" opacity="0.70"/>
+      <rect x="100" y="46.38297872340425" width="18" height="33.61702127659575" rx="3" fill="url(#barGrad)" opacity="0.80"/>
+      <rect x="125" y="27.872340425531917" width="18" height="52.12765957446808" rx="3" fill="url(#barGrad)" opacity="0.90"/>
+      <rect x="150" y="10" width="18" height="70" rx="3" fill="url(#barGrad)" opacity="1.00" filter="url(#glow)"/>
+  </g>
+
+  <g transform="translate(25, 140)">
+    <text class="mono" font-size="9" fill="var(--text-s)">TYPE: EDGE_WORKER // REGION: GLOBAL // UPTIME: 99.9%</text>
+  </g>
+
+  <circle cx="455" cy="25" r="4" fill="#22c55e">
+    <animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/>
+  </circle>
+</svg>

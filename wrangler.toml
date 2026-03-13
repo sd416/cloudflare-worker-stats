@@ -1,0 +1,11 @@
+name = "cloudflare-worker-stats"
+main = "src/index.ts"
+compatibility_date = "2024-12-02"
+
+[vars]
+
+# CF_API_TOKEN should be set as a secret via `wrangler secret put` This is mandatory
+#  -------
+# Set ONE of the following as a secret:
+#   CF_ZONE_ID     — for zone-level HTTP request analytics
+#   CF_ACCOUNT_ID  — for account-level Worker event analytics
