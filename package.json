@@ -8,11 +8,11 @@
     "test": "vitest run"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.18.0",
-    "@cloudflare/workers-types": "^4.20260629.1",
-    "typescript": "^6.0.3",
+    "@cloudflare/vitest-pool-workers": "^0.18.2",
+    "@cloudflare/workers-types": "^5.20260708.1",
+    "typescript": "^7.0.2",
     "vitest": "~4.1.10",
     "esbuild": "^0.28.1",
-    "wrangler": "^4.103.0"
+    "wrangler": "^4.107.1"
   }
 }
