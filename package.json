@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "vitest run"
+    "test": "vitest run",
+    "screenshots": "node scripts/generate-screenshots.mjs"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.20.3",

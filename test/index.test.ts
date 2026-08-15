@@ -5,6 +5,9 @@ import {
 } from "vitest";
 import {
 	formatNumber,
+	formatBytes,
+	parseDays,
+	computeStats,
 	buildSparklinePoints,
 	buildBars,
 	generateSvg,
@@ -13,9 +16,15 @@ import {
 	resolveTheme,
 	generateSvgMinimal,
 	generateSvgGradient,
+	generateSvgDashboard,
+	generateSvgBadge,
+	generateSvgHeatmap,
+	generateSvgTicker,
 	generateSvgForTheme,
 	buildAreaChart,
 	buildHorizontalBars,
+	buildHeatmapCells,
+	buildCandles,
 } from "../src/index";
 
 describe("formatNumber", () => {
@@ -40,6 +49,82 @@ describe("formatNumber", () => {
 		expect(formatNumber(0)).toBe("0");
 		expect(formatNumber(42)).toBe("42");
 		expect(formatNumber(100)).toBe("100");
+	});
+});
+
+describe("formatBytes", () => {
+	it("formats terabytes", () => {
+		expect(formatBytes(1_500_000_000_000)).toBe("1.5TB");
+	});
+
+	it("formats gigabytes", () => {
+		expect(formatBytes(1_240_000_000)).toBe("1.24GB");
+		expect(formatBytes(2_000_000_000)).toBe("2GB");
+	});
+
+	it("formats megabytes and kilobytes", () => {
+		expect(formatBytes(5_600_000)).toBe("5.6MB");
+		expect(formatBytes(42_000)).toBe("42KB");
+	});
+
+	it("formats small byte counts", () => {
+		expect(formatBytes(0)).toBe("0B");
+		expect(formatBytes(999)).toBe("999B");
+	});
+});
+
+describe("parseDays", () => {
+	it("defaults to 7 for null or invalid input", () => {
+		expect(parseDays(null)).toBe(7);
+		expect(parseDays("")).toBe(7);
+		expect(parseDays("abc")).toBe(7);
+	});
+
+	it("parses valid day counts", () => {
+		expect(parseDays("14")).toBe(14);
+		expect(parseDays("30")).toBe(30);
+		expect(parseDays("1")).toBe(1);
+	});
+
+	it("clamps out-of-range values", () => {
+		expect(parseDays("0")).toBe(1);
+		expect(parseDays("-5")).toBe(1);
+		expect(parseDays("90")).toBe(30);
+	});
+});
+
+describe("computeStats", () => {
+	it("computes total, avg, and peak", () => {
+		const stats = computeStats([
+			{ requests: 100, date: "2025-03-01" },
+			{ requests: 300, date: "2025-03-02" },
+			{ requests: 200, date: "2025-03-03" },
+		]);
+		expect(stats.total).toBe(600);
+		expect(stats.avg).toBe(200);
+		expect(stats.peak).toBe(300);
+	});
+
+	it("sums bytes and uniques when present", () => {
+		const stats = computeStats([
+			{ requests: 100, bytes: 1000, uniques: 10, date: "2025-03-01" },
+			{ requests: 200, bytes: 2000, uniques: 20, date: "2025-03-02" },
+		]);
+		expect(stats.bytes).toBe(3000);
+		expect(stats.uniques).toBe(30);
+	});
+
+	it("leaves bytes and uniques undefined when absent", () => {
+		const stats = computeStats([{ requests: 100, date: "2025-03-01" }]);
+		expect(stats.bytes).toBeUndefined();
+		expect(stats.uniques).toBeUndefined();
+	});
+
+	it("handles empty data", () => {
+		const stats = computeStats([]);
+		expect(stats.total).toBe(0);
+		expect(stats.avg).toBe(0);
+		expect(stats.peak).toBe(0);
 	});
 });
 
@@ -201,11 +286,30 @@ describe("generateSvg", () => {
 		expect(svg).not.toContain("WEBSITE TRAFFIC");
 	});
 
-	it("includes footer with system info", () => {
+	it("includes footer with avg and peak stats", () => {
+		const data = [
+			{ requests: 100, date: "2025-03-01" },
+			{ requests: 300, date: "2025-03-02" },
+		];
+		const svg = generateSvg(data, 400);
+		expect(svg).toContain("AVG: 200/D");
+		expect(svg).toContain("PEAK: 300");
+	});
+
+	it("includes bandwidth and uniques in footer when available", () => {
+		const data = [
+			{ requests: 100, bytes: 1_240_000_000, uniques: 500, date: "2025-03-01" },
+		];
+		const svg = generateSvg(data, 100);
+		expect(svg).toContain("BW: 1.24GB");
+		expect(svg).toContain("UNIQ: 500");
+	});
+
+	it("omits bandwidth and uniques from footer when unavailable", () => {
 		const data = [{ requests: 100, date: "2025-03-01" }];
 		const svg = generateSvg(data, 100);
-		expect(svg).toContain("TYPE: EDGE_WORKER");
-		expect(svg).toContain("UPTIME: 99.9%");
+		expect(svg).not.toContain("BW:");
+		expect(svg).not.toContain("UNIQ:");
 	});
 
 	it("includes Y-axis labels showing max and min values", () => {
@@ -279,6 +383,17 @@ describe("resolveTheme", () => {
 
 	it('returns "gradient" for /gradient', () => {
 		expect(resolveTheme("/gradient")).toBe("gradient");
+	});
+
+	it('returns "dashboard" for /dashboard', () => {
+		expect(resolveTheme("/dashboard")).toBe("dashboard");
+		expect(resolveTheme("/Dashboard/")).toBe("dashboard");
+	});
+
+	it('returns "badge", "heatmap", and "ticker" for their paths', () => {
+		expect(resolveTheme("/badge")).toBe("badge");
+		expect(resolveTheme("/heatmap")).toBe("heatmap");
+		expect(resolveTheme("/ticker")).toBe("ticker");
 	});
 
 	it("is case-insensitive", () => {
@@ -502,6 +617,285 @@ describe("generateSvgGradient", () => {
 });
 
 // ---------------------------------------------------------------------------
+// generateSvgDashboard (Dashboard — stat tile grid with sparkline)
+// ---------------------------------------------------------------------------
+describe("generateSvgDashboard", () => {
+	const sampleData = [
+		{ requests: 100, bytes: 1_000_000, uniques: 50, date: "2025-03-01" },
+		{ requests: 300, bytes: 3_000_000, uniques: 150, date: "2025-03-02" },
+		{ requests: 200, bytes: 2_000_000, uniques: 100, date: "2025-03-03" },
+	];
+
+	it("returns valid SVG with correct dimensions", () => {
+		const svg = generateSvgDashboard(sampleData, 600);
+		expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
+		expect(svg).toContain('width="480"');
+		expect(svg).toContain('height="160"');
+	});
+
+	it("displays formatted total requests", () => {
+		const svg = generateSvgDashboard(sampleData, 3_140_000);
+		expect(svg).toContain("3.14M");
+	});
+
+	it("includes all four stat tiles", () => {
+		const svg = generateSvgDashboard(sampleData, 600);
+		expect(svg).toContain("AVG / DAY");
+		expect(svg).toContain("PEAK DAY");
+		expect(svg).toContain("BANDWIDTH");
+		expect(svg).toContain("VISITORS");
+	});
+
+	it("shows computed stat values", () => {
+		const svg = generateSvgDashboard(sampleData, 600);
+		expect(svg).toContain(">200<"); // avg
+		expect(svg).toContain(">300<"); // peak
+		expect(svg).toContain("6MB"); // bandwidth
+		expect(svg).toContain(">300<"); // uniques (also 300)
+	});
+
+	it("shows N/A when bytes and uniques are unavailable", () => {
+		const svg = generateSvgDashboard(
+			[{ requests: 100, date: "2025-03-01" }],
+			100,
+		);
+		expect(svg).toContain("N/A");
+	});
+
+	it("includes a sparkline polyline", () => {
+		const svg = generateSvgDashboard(sampleData, 600);
+		expect(svg).toContain("<polyline");
+	});
+
+	it("supports light mode via prefers-color-scheme", () => {
+		const svg = generateSvgDashboard(sampleData, 600);
+		expect(svg).toContain("prefers-color-scheme: light");
+	});
+
+	it("derives name and period from label", () => {
+		const svg = generateSvgDashboard(sampleData, 600, "Worker Requests (last 14 days)");
+		expect(svg).toContain("WORKER REQUESTS");
+		expect(svg).toContain("last 14 days");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// generateSvgBadge (Badge — shields.io-style compact pill)
+// ---------------------------------------------------------------------------
+describe("generateSvgBadge", () => {
+	const sampleData = [
+		{ requests: 100, date: "2025-03-01" },
+		{ requests: 200, date: "2025-03-02" },
+	];
+
+	it("returns a compact 28px-tall SVG", () => {
+		const svg = generateSvgBadge(sampleData, 300);
+		expect(svg).toContain('height="28"');
+		expect(svg).toContain('xmlns="http://www.w3.org/2000/svg"');
+	});
+
+	it("displays formatted total requests", () => {
+		const svg = generateSvgBadge(sampleData, 2_140_000);
+		expect(svg).toContain("2.14M");
+	});
+
+	it("includes lowercase label with short period", () => {
+		const svg = generateSvgBadge(sampleData, 300, "Website Traffic (last 14 days)");
+		expect(svg).toContain("website traffic \u00b7 14d");
+	});
+
+	it("uses Cloudflare Orange for the value segment", () => {
+		const svg = generateSvgBadge(sampleData, 300);
+		expect(svg).toContain('fill="#F6821F"');
+	});
+
+	it("includes an accessible aria-label", () => {
+		const svg = generateSvgBadge(sampleData, 300);
+		expect(svg).toContain("aria-label=");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// buildHeatmapCells
+// ---------------------------------------------------------------------------
+describe("buildHeatmapCells", () => {
+	it("returns empty string for empty data", () => {
+		expect(buildHeatmapCells([])).toBe("");
+	});
+
+	it("produces one cell per data point", () => {
+		const data = [
+			{ requests: 100, date: "2025-03-01" },
+			{ requests: 200, date: "2025-03-02" },
+			{ requests: 300, date: "2025-03-03" },
+		];
+		const cells = buildHeatmapCells(data);
+		const count = (cells.match(/<rect /g) || []).length;
+		expect(count).toBe(3);
+	});
+
+	it("assigns intensity levels based on value", () => {
+		const data = [
+			{ requests: 10, date: "2025-03-01" },
+			{ requests: 100, date: "2025-03-02" },
+		];
+		const cells = buildHeatmapCells(data);
+		expect(cells).toContain('fill="var(--h1)"');
+		expect(cells).toContain('fill="var(--h4)"');
+	});
+
+	it("places cells by weekday row (Sun=0)", () => {
+		// 2025-03-02 is a Sunday → row 0, y=0
+		const data = [{ requests: 100, date: "2025-03-02" }];
+		const cells = buildHeatmapCells(data);
+		expect(cells).toContain('y="0"');
+	});
+
+	it("includes tooltips with date and count", () => {
+		const data = [{ requests: 12_400, date: "2025-03-01" }];
+		const cells = buildHeatmapCells(data);
+		expect(cells).toContain("<title>2025-03-01: 12.4K requests</title>");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// generateSvgHeatmap (Heatmap — contribution-graph style)
+// ---------------------------------------------------------------------------
+describe("generateSvgHeatmap", () => {
+	const sampleData = [
+		{ requests: 100, bytes: 1_000_000, date: "2025-03-01" },
+		{ requests: 300, bytes: 3_000_000, date: "2025-03-02" },
+		{ requests: 200, bytes: 2_000_000, date: "2025-03-03" },
+	];
+
+	it("returns valid SVG with correct dimensions", () => {
+		const svg = generateSvgHeatmap(sampleData, 600);
+		expect(svg).toContain('width="480"');
+		expect(svg).toContain('height="160"');
+	});
+
+	it("displays formatted total requests", () => {
+		const svg = generateSvgHeatmap(sampleData, 3_140_000);
+		expect(svg).toContain("3.14M");
+	});
+
+	it("includes heatmap cells and legend", () => {
+		const svg = generateSvgHeatmap(sampleData, 600);
+		expect(svg).toContain('fill="var(--h1)"');
+		expect(svg).toContain(">less</text>");
+		expect(svg).toContain(">more</text>");
+	});
+
+	it("includes weekday row labels", () => {
+		const svg = generateSvgHeatmap(sampleData, 600);
+		expect(svg).toContain("Mon");
+		expect(svg).toContain("Wed");
+		expect(svg).toContain("Fri");
+	});
+
+	it("supports light mode via prefers-color-scheme", () => {
+		const svg = generateSvgHeatmap(sampleData, 600);
+		expect(svg).toContain("prefers-color-scheme: light");
+	});
+
+	it("includes avg and peak stats", () => {
+		const svg = generateSvgHeatmap(sampleData, 600);
+		expect(svg).toContain("avg 200/day");
+		expect(svg).toContain("peak 300");
+	});
+});
+
+// ---------------------------------------------------------------------------
+// buildCandles
+// ---------------------------------------------------------------------------
+describe("buildCandles", () => {
+	it("returns empty string for empty values", () => {
+		expect(buildCandles([])).toBe("");
+	});
+
+	it("produces one body rect and one wick line per value", () => {
+		const candles = buildCandles([10, 20, 30]);
+		expect((candles.match(/<rect /g) || []).length).toBe(3);
+		expect((candles.match(/<line /g) || []).length).toBe(3);
+	});
+
+	it("colors up days green and down days red", () => {
+		const candles = buildCandles([10, 30, 20]);
+		expect(candles).toContain('fill="var(--up)"');
+		expect(candles).toContain('fill="var(--down)"');
+	});
+
+	it("treats the first day as up", () => {
+		const candles = buildCandles([42]);
+		expect(candles).toContain('fill="var(--up)"');
+		expect(candles).not.toContain('fill="var(--down)"');
+	});
+});
+
+// ---------------------------------------------------------------------------
+// generateSvgTicker (Ticker — candlestick style)
+// ---------------------------------------------------------------------------
+describe("generateSvgTicker", () => {
+	const sampleData = [
+		{ requests: 100, bytes: 1_000_000, date: "2025-03-01" },
+		{ requests: 300, bytes: 3_000_000, date: "2025-03-02" },
+		{ requests: 200, bytes: 2_000_000, date: "2025-03-03" },
+	];
+
+	it("returns valid SVG with correct dimensions", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		expect(svg).toContain('width="480"');
+		expect(svg).toContain('height="160"');
+	});
+
+	it("displays ticker-style name with slash", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		expect(svg).toContain("WEBSITE/TRAFFIC");
+	});
+
+	it("shows percent change vs previous day", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		// 200 vs 300 = -33.3%
+		expect(svg).toContain("-33.3% vs prev day");
+		expect(svg).toContain("\u25bc");
+	});
+
+	it("omits change line with a single data point", () => {
+		const svg = generateSvgTicker([sampleData[0]], 100);
+		expect(svg).not.toContain("vs prev day");
+	});
+
+	it("includes HI, LO, and VOL footer", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		expect(svg).toContain("HI 300");
+		expect(svg).toContain("LO 100");
+		expect(svg).toContain("VOL 6MB");
+	});
+
+	it("omits VOL when bytes are unavailable", () => {
+		const svg = generateSvgTicker(
+			[
+				{ requests: 100, date: "2025-03-01" },
+				{ requests: 200, date: "2025-03-02" },
+			],
+			300,
+		);
+		expect(svg).not.toContain("VOL");
+	});
+
+	it("includes candle bodies and wicks", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		expect(svg).toContain('fill="var(--up)"');
+		expect(svg).toContain('fill="var(--down)"');
+	});
+
+	it("supports light mode via prefers-color-scheme", () => {
+		const svg = generateSvgTicker(sampleData, 600);
+		expect(svg).toContain("prefers-color-scheme: light");
+	});
+});
+
+// ---------------------------------------------------------------------------
 // generateSvgForTheme (dispatcher)
 // ---------------------------------------------------------------------------
 describe("generateSvgForTheme", () => {
@@ -526,5 +920,18 @@ describe("generateSvgForTheme", () => {
 		const svg = generateSvgForTheme("gradient", sampleData, 300, "Website Traffic (last 7 days)");
 		expect(svg).toContain('id="gradBg"');
 		expect(svg).not.toContain("SYSTEM.STATUS:");
+	});
+
+	it('returns dashboard theme SVG for "dashboard"', () => {
+		const svg = generateSvgForTheme("dashboard", sampleData, 300, "Website Traffic (last 7 days)");
+		expect(svg).toContain("AVG / DAY");
+		expect(svg).not.toContain("SYSTEM.STATUS:");
+	});
+
+	it('returns badge, heatmap, and ticker SVGs for their themes', () => {
+		const label = "Website Traffic (last 7 days)";
+		expect(generateSvgForTheme("badge", sampleData, 300, label)).toContain('height="28"');
+		expect(generateSvgForTheme("heatmap", sampleData, 300, label)).toContain('fill="var(--h1)"');
+		expect(generateSvgForTheme("ticker", sampleData, 300, label)).toContain("WEBSITE/TRAFFIC");
 	});
 });

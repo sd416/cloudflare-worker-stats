@@ -1,0 +1,49 @@
+<svg width="480" height="160" viewBox="0 0 480 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      :root { --bg: #0f172a; --tile: #1e293b; --text-p: #f1f5f9; --text-s: #94a3b8; --brd: #334155; --accent: #818cf8; }
+      @media (prefers-color-scheme: light) {
+        :root { --bg: #ffffff; --tile: #f1f5f9; --text-p: #0f172a; --text-s: #64748b; --brd: #e2e8f0; --accent: #6366f1; }
+      }
+      .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="480" height="160" rx="12" fill="var(--bg)"/>
+  <rect x="0.5" y="0.5" width="479" height="159" rx="11.5" stroke="var(--brd)" fill="none"/>
+
+  <g transform="translate(25, 34)">
+    <text class="sans" font-size="10" font-weight="600" fill="var(--accent)" letter-spacing="1">WEBSITE TRAFFIC</text>
+    <text y="34" class="sans" font-size="34" font-weight="800" fill="var(--text-p)">2.14M</text>
+    <text y="52" class="sans" font-size="10" fill="var(--text-s)">last 7 days</text>
+  </g>
+
+  <g transform="translate(25, 105)">
+    <polyline points="0.0,31.0 32.5,22.0 65.0,13.4 97.5,18.6 130.0,5.1 162.5,16.0 195.0,4.0" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g transform="translate(25, 152)">
+    <text class="sans" font-size="9" fill="var(--text-s)">Cloudflare Analytics</text>
+  </g>
+
+  <g transform="translate(250, 24)">
+      <rect width="100" height="52" rx="8" fill="var(--tile)" stroke="var(--brd)"/>
+      <text x="10" y="18" class="sans" font-size="8" font-weight="600" fill="var(--accent)" letter-spacing="1">AVG / DAY</text>
+      <text x="10" y="38" class="sans" font-size="15" font-weight="700" fill="var(--text-p)">305.71K</text>
+    </g>
+  <g transform="translate(358, 24)">
+      <rect width="100" height="52" rx="8" fill="var(--tile)" stroke="var(--brd)"/>
+      <text x="10" y="18" class="sans" font-size="8" font-weight="600" fill="var(--accent)" letter-spacing="1">PEAK DAY</text>
+      <text x="10" y="38" class="sans" font-size="15" font-weight="700" fill="var(--text-p)">337K</text>
+    </g>
+  <g transform="translate(250, 84)">
+      <rect width="100" height="52" rx="8" fill="var(--tile)" stroke="var(--brd)"/>
+      <text x="10" y="18" class="sans" font-size="8" font-weight="600" fill="var(--accent)" letter-spacing="1">BANDWIDTH</text>
+      <text x="10" y="38" class="sans" font-size="15" font-weight="700" fill="var(--text-p)">3.21GB</text>
+    </g>
+  <g transform="translate(358, 84)">
+      <rect width="100" height="52" rx="8" fill="var(--tile)" stroke="var(--brd)"/>
+      <text x="10" y="18" class="sans" font-size="8" font-weight="600" fill="var(--accent)" letter-spacing="1">VISITORS</text>
+      <text x="10" y="38" class="sans" font-size="15" font-weight="700" fill="var(--text-p)">171.1K</text>
+    </g>
+</svg>

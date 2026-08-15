@@ -1,0 +1,76 @@
+<svg width="480" height="160" viewBox="0 0 480 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      :root {
+        --bg: #0d1117; --text-p: #f0f6fc; --text-s: #8b949e; --brd: #30363d;
+        --accent: #39d353; --h1: #0e4429; --h2: #006d32; --h3: #26a641; --h4: #39d353;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #ffffff; --text-p: #1f2328; --text-s: #59636e; --brd: #d1d9e0;
+          --accent: #216e39; --h1: #9be9a8; --h2: #40c463; --h3: #30a14e; --h4: #216e39;
+        }
+      }
+      .sans { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    </style>
+  </defs>
+
+  <rect width="480" height="160" rx="12" fill="var(--bg)"/>
+  <rect x="0.5" y="0.5" width="479" height="159" rx="11.5" stroke="var(--brd)" fill="none"/>
+
+  <g transform="translate(25, 34)">
+    <text class="sans" font-size="10" font-weight="600" fill="var(--accent)" letter-spacing="1">WEBSITE TRAFFIC</text>
+    <text y="34" class="sans" font-size="34" font-weight="800" fill="var(--text-p)">4.98M</text>
+    <text y="52" class="sans" font-size="10" fill="var(--text-s)">last 30 days</text>
+    <text y="76" class="sans" font-size="9" fill="var(--text-s)">avg 165.85K/day · peak 256.44K</text>
+  </g>
+
+  <g transform="translate(25, 146)" class="sans" font-size="8" fill="var(--text-s)">
+    <text>less</text>
+    <rect x="22" y="-8" width="10" height="10" rx="2" fill="var(--h1)"/>
+    <rect x="36" y="-8" width="10" height="10" rx="2" fill="var(--h2)"/>
+    <rect x="50" y="-8" width="10" height="10" rx="2" fill="var(--h3)"/>
+    <rect x="64" y="-8" width="10" height="10" rx="2" fill="var(--h4)"/>
+    <text x="80">more</text>
+  </g>
+
+  <g transform="translate(330, 22)">
+    <g class="sans" font-size="8" fill="var(--text-s)">
+      <text x="-6" y="28" text-anchor="end">Mon</text>
+      <text x="-6" y="62" text-anchor="end">Wed</text>
+      <text x="-6" y="96" text-anchor="end">Fri</text>
+    </g>
+    <g>
+      <rect x="0" y="68" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-16: 165K requests</title></rect>
+      <rect x="0" y="85" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-17: 241.42K requests</title></rect>
+      <rect x="0" y="102" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-18: 188.95K requests</title></rect>
+      <rect x="17" y="0" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-19: 154.45K requests</title></rect>
+      <rect x="17" y="17" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-20: 219.04K requests</title></rect>
+      <rect x="17" y="34" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-21: 213.83K requests</title></rect>
+      <rect x="17" y="51" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-07-22: 109.28K requests</title></rect>
+      <rect x="17" y="68" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-07-23: 96.32K requests</title></rect>
+      <rect x="17" y="85" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-24: 171.05K requests</title></rect>
+      <rect x="17" y="102" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-25: 155.13K requests</title></rect>
+      <rect x="34" y="0" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-07-26: 101.77K requests</title></rect>
+      <rect x="34" y="17" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-27: 169.57K requests</title></rect>
+      <rect x="34" y="34" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-28: 251.13K requests</title></rect>
+      <rect x="34" y="51" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-29: 199.57K requests</title></rect>
+      <rect x="34" y="68" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-07-30: 147.13K requests</title></rect>
+      <rect x="34" y="85" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-07-31: 201.08K requests</title></rect>
+      <rect x="34" y="102" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-08-01: 205.42K requests</title></rect>
+      <rect x="51" y="0" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-08-02: 105.03K requests</title></rect>
+      <rect x="51" y="17" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-08-03: 85.94K requests</title></rect>
+      <rect x="51" y="34" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-08-04: 169.53K requests</title></rect>
+      <rect x="51" y="51" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-08-05: 171.84K requests</title></rect>
+      <rect x="51" y="68" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-08-06: 117.24K requests</title></rect>
+      <rect x="51" y="85" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-08-07: 173.07K requests</title></rect>
+      <rect x="51" y="102" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-08-08: 256.44K requests</title></rect>
+      <rect x="68" y="0" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-08-09: 206.31K requests</title></rect>
+      <rect x="68" y="17" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-08-10: 137.55K requests</title></rect>
+      <rect x="68" y="34" width="14" height="14" rx="3" fill="var(--h3)"><title>2026-08-11: 181.03K requests</title></rect>
+      <rect x="68" y="51" width="14" height="14" rx="3" fill="var(--h4)"><title>2026-08-12: 196.65K requests</title></rect>
+      <rect x="68" y="68" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-08-13: 104.3K requests</title></rect>
+      <rect x="68" y="85" width="14" height="14" rx="3" fill="var(--h2)"><title>2026-08-14: 80.39K requests</title></rect>
+    </g>
+  </g>
+</svg>
