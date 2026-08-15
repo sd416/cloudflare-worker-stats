@@ -2,11 +2,11 @@
 
 [![Deploy to Cloudflare Workers](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/sd416/cloudflare-worker-stats)
 
-A Cloudflare Worker that generates a dynamic SVG bar chart showing the last 7 days of traffic from the Cloudflare Analytics API. Designed for embedding in a GitHub profile README.
+A Cloudflare Worker that generates a dynamic SVG bar chart showing the last 7-30 days of traffic from the Cloudflare Analytics API. Designed for embedding in a GitHub profile README.
 
 Supports two modes:
-- **Zone mode** — tracks HTTP requests for a specific domain using `CF_ZONE_ID`
-- **Worker mode** — tracks Worker invocations across your account using `CF_ACCOUNT_ID` (ideal for Workers on `*.workers.dev` or unbound from a specific zone)
+- **Zone mode** - tracks HTTP requests for a specific domain using `CF_ZONE_ID`
+- **Worker mode** - tracks Worker invocations across your account using `CF_ACCOUNT_ID` (ideal for Workers on `*.workers.dev` or unbound from a specific zone)
 
 ## Theme Options
 
@@ -17,8 +17,12 @@ Choose a theme by appending the theme name to your worker URL. The default theme
 | **Neon Terminal** | `/` or `/neon` | Dark terminal aesthetic with vertical bar chart, dot grid, glow effects, and Cloudflare Orange |
 | **Minimal** | `/minimal` | Clean card with full-width sparkline area chart and emerald accents |
 | **Gradient** | `/gradient` | Vibrant gradient background with horizontal daily breakdown bars (cyan-to-purple) |
+| **Dashboard** | `/dashboard` | Stat tile grid (avg/day, peak, bandwidth, visitors) with sparkline and indigo accents |
+| **Badge** | `/badge` | Compact shields.io-style pill (~28px tall) with label and total, ideal inline in a README |
+| **Heatmap** | `/heatmap` | GitHub contribution-graph style grid of daily cells, best with `?days=30` |
+| **Ticker** | `/ticker` | Stock-market candlestick style with green/red daily bars, change %, and HI/LO/VOL |
 
-### Neon Terminal (`/neon` — default)
+### Neon Terminal (`/neon`, default)
 
 Vertical bar chart with a terminal/hacker aesthetic. Monospace fonts, dot grid background, glow effects.
 
@@ -36,14 +40,53 @@ Horizontal daily breakdown bars with day-of-week labels and per-day request coun
 
 ![Gradient theme](screenshots/theme-gradient.svg)
 
+### Dashboard (`/dashboard`)
+
+Stat tile grid showing average requests/day, peak day, bandwidth, and unique visitors alongside the total and a sparkline.
+
+![Dashboard theme](screenshots/theme-dashboard.svg)
+
+### Badge (`/badge`)
+
+Compact shields.io-style pill showing the label and total, perfect inline next to other badges.
+
+![Badge theme](screenshots/theme-badge.svg)
+
+### Heatmap (`/heatmap`)
+
+GitHub contribution-graph style grid where each cell is a day, colored by traffic intensity. Pairs well with `?days=30`.
+
+![Heatmap theme](screenshots/theme-heatmap.svg)
+
+### Ticker (`/ticker`)
+
+Stock-market candlestick aesthetic with green/red daily bars vs. the previous day, change %, and HI/LO/VOL stats.
+
+![Ticker theme](screenshots/theme-ticker.svg)
+
 All themes automatically adapt to **light/dark mode** via the `prefers-color-scheme` media query.
+
+## Options
+
+Append query parameters to any theme URL:
+
+| Parameter | Description |
+|-----------|-------------|
+| `?days=N` | Number of days to chart (1-30, default 7). Charts and labels adapt automatically. |
+| `?refresh` | Bypass the 1-hour cache. |
+
+```markdown
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/dashboard?days=30)
+```
 
 ## Features
 
-- Fetches the last 7 days of request data from the Cloudflare GraphQL Analytics API
+- Fetches the last 7-30 days of request data from the Cloudflare GraphQL Analytics API (`?days=N`)
 - Displays total requests in compact format (e.g. `2.14M`)
+- Shows **avg/day** and **peak day** stats on every theme
+- Shows **bandwidth** (data served) and **unique visitors** (zone mode) when available
 - Renders a 480×160 SVG chart
-- **Three distinct UI themes** — Neon Terminal (vertical bars), Minimal (sparkline area chart), and Gradient (horizontal daily bars)
+- **Seven distinct UI themes**: Neon Terminal, Minimal, Gradient, Dashboard, Badge, Heatmap, and Ticker
 - Automatically adapts to light/dark theme via `prefers-color-scheme` media query
 - One-click deploy via the button above
 
@@ -92,6 +135,18 @@ Add the worker URL to your GitHub profile README (or anywhere that renders Markd
 
 <!-- Gradient Modern -->
 ![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/gradient)
+
+<!-- Dashboard -->
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/dashboard)
+
+<!-- Badge (compact pill) -->
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/badge)
+
+<!-- Heatmap (best with 30 days) -->
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/heatmap?days=30)
+
+<!-- Ticker -->
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/ticker)
 ```
 
 **HTML embed (for more control):**
@@ -106,9 +161,15 @@ Add the worker URL to your GitHub profile README (or anywhere that renders Markd
 ![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/gradient?refresh)
 ```
 
+**Chart a different time range with `?days`:**
+
+```markdown
+![Cloudflare Usage](https://your-worker.your-subdomain.workers.dev/neon?days=14)
+```
+
 ## Generating Secrets
 
-### `CF_API_TOKEN` — Cloudflare API Token
+### `CF_API_TOKEN` - Cloudflare API Token
 
 This token allows the worker to read analytics data.
 
@@ -125,9 +186,9 @@ This token allows the worker to read analytics data.
    - **Zone Resources** (zone mode only): choose **Include → Specific zone** and pick the zone you want to track (or select **All zones** if you prefer)
    - **Account Resources** (worker mode only): choose **Include → your account**
 7. Click **Continue to summary** → **Create Token**.
-8. Copy the token value — you will not be able to see it again.
+8. Copy the token value. You will not be able to see it again.
 
-### `CF_ZONE_ID` — Cloudflare Zone ID (zone mode)
+### `CF_ZONE_ID` - Cloudflare Zone ID (zone mode)
 
 The Zone ID identifies which domain's traffic data to query.
 
@@ -136,7 +197,7 @@ The Zone ID identifies which domain's traffic data to query.
 3. On the **Overview** page, scroll down to the right-hand sidebar.
 4. Under **API**, copy the **Zone ID** value.
 
-### `CF_ACCOUNT_ID` — Cloudflare Account ID (worker mode)
+### `CF_ACCOUNT_ID` - Cloudflare Account ID (worker mode)
 
 The Account ID identifies your Cloudflare account for querying Worker invocation data. Use this when your Worker runs on a `*.workers.dev` subdomain or is not bound to a specific zone.
 
@@ -166,10 +227,11 @@ npx wrangler secret put CF_ACCOUNT_ID
 ## Development
 
 ```bash
-npm install     # Install dependencies
-npm run dev     # Start local dev server
-npm test        # Run tests
-npm run deploy  # Deploy to Cloudflare Workers
+npm install          # Install dependencies
+npm run dev          # Start local dev server
+npm test             # Run tests
+npm run screenshots  # Regenerate theme screenshots from sample data
+npm run deploy       # Deploy to Cloudflare Workers
 ```
 
 ## Contributing

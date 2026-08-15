@@ -31,32 +31,34 @@
   </g>
 
   <g transform="translate(25, 62)">
-    <text class="sans" font-size="38" font-weight="800" fill="var(--text-p)">144.6K</text>
+    <text class="sans" font-size="38" font-weight="800" fill="var(--text-p)">2.14M</text>
     <text y="20" class="sans" font-size="10" fill="var(--text-s)">last 7 days</text>
+    <text y="38" class="sans" font-size="9" fill="var(--text-s)">avg 305.71K/day · peak 337K</text>
+    <text y="52" class="sans" font-size="9" fill="var(--text-s)">3.21GB · 171.1K visitors</text>
   </g>
 
   <g transform="translate(240, 18)">
-    <text x="0" y="9" class="sans" font-size="8" fill="var(--text-s)">Tue</text>
-      <rect x="28" y="0" width="59.6" height="10" rx="4" fill="url(#hGrad)" opacity="0.50"/>
-      <text x="92.6" y="9" class="sans" font-size="7" fill="var(--text-s)">12.4K</text>
-      <text x="0" y="26" class="sans" font-size="8" fill="var(--text-s)">Wed</text>
-      <rect x="28" y="17" width="87.5" height="10" rx="4" fill="url(#hGrad)" opacity="0.58"/>
-      <text x="120.5" y="26" class="sans" font-size="7" fill="var(--text-s)">18.2K</text>
-      <text x="0" y="43" class="sans" font-size="8" fill="var(--text-s)">Thu</text>
-      <rect x="28" y="34" width="73.6" height="10" rx="4" fill="url(#hGrad)" opacity="0.67"/>
-      <text x="106.6" y="43" class="sans" font-size="7" fill="var(--text-s)">15.3K</text>
-      <text x="0" y="60" class="sans" font-size="8" fill="var(--text-s)">Fri</text>
-      <rect x="28" y="51" width="106.3" height="10" rx="4" fill="url(#hGrad)" opacity="0.75"/>
-      <text x="139.3" y="60" class="sans" font-size="7" fill="var(--text-s)">22.1K</text>
-      <text x="0" y="77" class="sans" font-size="8" fill="var(--text-s)">Sat</text>
-      <rect x="28" y="68" width="95.2" height="10" rx="4" fill="url(#hGrad)" opacity="0.83"/>
-      <text x="128.2" y="77" class="sans" font-size="7" fill="var(--text-s)">19.8K</text>
-      <text x="0" y="94" class="sans" font-size="8" fill="var(--text-s)">Sun</text>
-      <rect x="28" y="85" width="123.1" height="10" rx="4" fill="url(#hGrad)" opacity="0.92"/>
-      <text x="156.1" y="94" class="sans" font-size="7" fill="var(--text-s)">25.6K</text>
-      <text x="0" y="111" class="sans" font-size="8" fill="var(--text-s)">Mon</text>
-      <rect x="28" y="102" width="150.0" height="10" rx="4" fill="url(#hGrad)" opacity="1.00"/>
-      <text x="183.0" y="111" class="sans" font-size="7" fill="var(--text-s)">31.2K</text>
+    <text x="0" y="9.0" class="sans" font-size="8" fill="var(--text-s)">Sat</text>
+      <rect x="28" y="0.0" width="118.0" height="10" rx="4" fill="url(#hGrad)" opacity="0.50"/>
+      <text x="151.0" y="9.0" class="sans" font-size="7" fill="var(--text-s)">265K</text>
+      <text x="0" y="26.0" class="sans" font-size="8" fill="var(--text-s)">Sun</text>
+      <rect x="28" y="17.0" width="128.6" height="10" rx="4" fill="url(#hGrad)" opacity="0.58"/>
+      <text x="161.6" y="26.0" class="sans" font-size="7" fill="var(--text-s)">289K</text>
+      <text x="0" y="43.0" class="sans" font-size="8" fill="var(--text-s)">Mon</text>
+      <rect x="28" y="34.0" width="138.9" height="10" rx="4" fill="url(#hGrad)" opacity="0.67"/>
+      <text x="171.9" y="43.0" class="sans" font-size="7" fill="var(--text-s)">312K</text>
+      <text x="0" y="60.0" class="sans" font-size="8" fill="var(--text-s)">Tue</text>
+      <rect x="28" y="51.0" width="132.6" height="10" rx="4" fill="url(#hGrad)" opacity="0.75"/>
+      <text x="165.6" y="60.0" class="sans" font-size="7" fill="var(--text-s)">298K</text>
+      <text x="0" y="77.0" class="sans" font-size="8" fill="var(--text-s)">Wed</text>
+      <rect x="28" y="68.0" width="148.7" height="10" rx="4" fill="url(#hGrad)" opacity="0.83"/>
+      <text x="181.7" y="77.0" class="sans" font-size="7" fill="var(--text-s)">334K</text>
+      <text x="0" y="94.0" class="sans" font-size="8" fill="var(--text-s)">Thu</text>
+      <rect x="28" y="85.0" width="135.8" height="10" rx="4" fill="url(#hGrad)" opacity="0.92"/>
+      <text x="168.8" y="94.0" class="sans" font-size="7" fill="var(--text-s)">305K</text>
+      <text x="0" y="111.0" class="sans" font-size="8" fill="var(--text-s)">Fri</text>
+      <rect x="28" y="102.0" width="150.0" height="10" rx="4" fill="url(#hGrad)" opacity="1.00"/>
+      <text x="183.0" y="111.0" class="sans" font-size="7" fill="var(--text-s)">337K</text>
   </g>
 
   <g transform="translate(25, 150)">

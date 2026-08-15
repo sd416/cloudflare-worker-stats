@@ -1,0 +1,53 @@
+<svg width="480" height="160" viewBox="0 0 480 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      :root {
+        --bg: #0b0e11; --text-p: #eaecef; --text-s: #5e6673; --brd: #252a30;
+        --up: #16c784; --down: #ea3943;
+      }
+      @media (prefers-color-scheme: light) {
+        :root {
+          --bg: #ffffff; --text-p: #16171a; --text-s: #707a8a; --brd: #e5e7eb;
+          --up: #059669; --down: #dc2626;
+        }
+      }
+      .mono { font-family: ui-monospace, SFMono-Regular, monospace; }
+    </style>
+  </defs>
+
+  <rect width="480" height="160" rx="12" fill="var(--bg)"/>
+  <rect x="0.5" y="0.5" width="479" height="159" rx="11.5" stroke="var(--brd)" fill="none"/>
+
+  <text x="25" y="30" class="mono" font-size="11" font-weight="bold" fill="var(--text-p)">WEBSITE/TRAFFIC <tspan fill="var(--text-s)">· 7D</tspan></text>
+  <text x="25" y="66" class="mono" font-size="30" font-weight="800" fill="var(--text-p)">2.14M</text>
+  <text x="25" y="86" class="mono" font-size="11" fill="var(--up)">▲ +10.5% vs prev day</text>
+  <text x="25" y="140" class="mono" font-size="9" fill="var(--text-s)">HI 337K · LO 265K · VOL 3.21GB</text>
+
+  <g transform="translate(240, 25)">
+    <line x1="0" y1="25" x2="215" y2="25" stroke="var(--brd)" stroke-dasharray="3 3"/>
+    <line x1="0" y1="55" x2="215" y2="55" stroke="var(--brd)" stroke-dasharray="3 3"/>
+    <g>
+      <line x1="15.4" y1="71.0" x2="15.4" y2="79.0" stroke="var(--up)" stroke-width="2"/>
+      <rect x="6.4" y="75.0" width="18.0" height="2.0" fill="var(--up)"/>
+      <line x1="46.1" y1="47.7" x2="46.1" y2="79.0" stroke="var(--up)" stroke-width="2"/>
+      <rect x="37.1" y="51.7" width="18.0" height="23.3" fill="var(--up)"/>
+      <line x1="76.8" y1="25.3" x2="76.8" y2="55.7" stroke="var(--up)" stroke-width="2"/>
+      <rect x="67.8" y="29.3" width="18.0" height="22.4" fill="var(--up)"/>
+      <line x1="107.5" y1="25.3" x2="107.5" y2="46.9" stroke="var(--down)" stroke-width="2"/>
+      <rect x="98.5" y="29.3" width="18.0" height="13.6" fill="var(--down)"/>
+      <line x1="138.2" y1="3.9" x2="138.2" y2="46.9" stroke="var(--up)" stroke-width="2"/>
+      <rect x="129.2" y="7.9" width="18.0" height="35.0" fill="var(--up)"/>
+      <line x1="168.9" y1="3.9" x2="168.9" y2="40.1" stroke="var(--down)" stroke-width="2"/>
+      <rect x="159.9" y="7.9" width="18.0" height="28.2" fill="var(--down)"/>
+      <line x1="199.6" y1="1.0" x2="199.6" y2="40.1" stroke="var(--up)" stroke-width="2"/>
+      <rect x="190.6" y="5.0" width="18.0" height="31.1" fill="var(--up)"/>
+    </g>
+    <text x="15.4" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">S</text>
+      <text x="46.1" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">S</text>
+      <text x="76.8" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">M</text>
+      <text x="107.5" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">T</text>
+      <text x="138.2" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">W</text>
+      <text x="168.9" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">T</text>
+      <text x="199.6" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">F</text>
+  </g>
+</svg>
