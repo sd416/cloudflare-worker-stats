@@ -77,7 +77,7 @@ export function formatBytes(n: number): string {
 	if (n >= 1e3) {
 		return (n / 1e3).toFixed(2).replace(/\.?0+$/, "") + "KB";
 	}
-	return n + "B";
+	return `${n}B`;
 }
 
 /** Parse a ?days= query value into a day count, clamped to 1–30. Defaults to 7. */
@@ -141,16 +141,25 @@ export function getDateRange(days: number = 7): { start: string; end: string } {
 	};
 }
 
-/** Send a GraphQL query to the Cloudflare Analytics API and return the parsed JSON. */
-async function cfGraphQL<T>(apiToken: string, query: string): Promise<T> {
+/** Send a parameterised GraphQL query to the Cloudflare Analytics API and return the parsed JSON. */
+async function cfGraphQL<T>(
+	apiToken: string,
+	query: string,
+	variables: Record<string, unknown>,
+): Promise<T> {
 	const resp = await fetch("https://api.cloudflare.com/client/v4/graphql", {
 		method: "POST",
 		headers: {
 			Authorization: `Bearer ${apiToken}`,
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ query }),
+		body: JSON.stringify({ query, variables }),
 	});
+
+	if (!resp.ok) {
+		throw new Error(`Cloudflare API HTTP error: ${resp.status} ${resp.statusText}`);
+	}
+
 	return resp.json() as Promise<T>;
 }
 
@@ -162,12 +171,12 @@ async function fetchZoneRequestData(
 ): Promise<RequestData[]> {
 	const { start, end } = getDateRange(days);
 
-	const query = `query {
+	const query = `query GetZoneAnalytics($zoneTag: String!, $start: String!, $end: String!, $limit: Int!) {
   viewer {
-    zones(filter: {zoneTag: "${zoneId}"}) {
+    zones(filter: { zoneTag: $zoneTag }) {
       httpRequests1dGroups(
-        limit: ${days}
-        filter: {date_geq: "${start}", date_lt: "${end}"}
+        limit: $limit
+        filter: { date_geq: $start, date_lt: $end }
         orderBy: [date_ASC]
       ) {
         sum { requests bytes }
@@ -178,7 +187,12 @@ async function fetchZoneRequestData(
   }
 }`;
 
-	const json = await cfGraphQL<ZoneGraphQLResponse>(apiToken, query);
+	const json = await cfGraphQL<ZoneGraphQLResponse>(apiToken, query, {
+		zoneTag: zoneId,
+		start,
+		end,
+		limit: days,
+	});
 
 	if (json.errors && json.errors.length > 0) {
 		throw new Error(
@@ -186,8 +200,7 @@ async function fetchZoneRequestData(
 		);
 	}
 
-	const groups =
-		json.data?.viewer.zones[0]?.httpRequests1dGroups ?? [];
+	const groups = json.data?.viewer.zones[0]?.httpRequests1dGroups ?? [];
 	return groups.map((g) => ({
 		requests: g.sum.requests,
 		bytes: g.sum.bytes,
@@ -204,12 +217,12 @@ async function fetchWorkerEventData(
 ): Promise<RequestData[]> {
 	const { start, end } = getDateRange(days);
 
-	const query = `query {
+	const query = `query GetWorkerAnalytics($accountTag: String!, $start: String!, $end: String!, $limit: Int!) {
   viewer {
-    accounts(filter: {accountTag: "${accountId}"}) {
+    accounts(filter: { accountTag: $accountTag }) {
       workersInvocationsAdaptive(
-        limit: ${days}
-        filter: {date_geq: "${start}", date_lt: "${end}"}
+        limit: $limit
+        filter: { date_geq: $start, date_lt: $end }
         orderBy: [date_ASC]
       ) {
         sum { requests responseBodySize }
@@ -219,7 +232,12 @@ async function fetchWorkerEventData(
   }
 }`;
 
-	const json = await cfGraphQL<WorkerEventsGraphQLResponse>(apiToken, query);
+	const json = await cfGraphQL<WorkerEventsGraphQLResponse>(apiToken, query, {
+		accountTag: accountId,
+		start,
+		end,
+		limit: days,
+	});
 
 	if (json.errors && json.errors.length > 0) {
 		throw new Error(
@@ -266,11 +284,18 @@ export function buildBars(
 		.join("\n      ");
 }
 
-/** Generate an error SVG for display when something goes wrong. */
+/** Generate a clean SVG for error states. */
 export function generateErrorSvg(msg: string): string {
-	return `<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">
-  <rect width="100%" height="100%" fill="#fff5f5" rx="10" stroke="#feb2b2"/>
-  <text x="20" y="55" font-family="sans-serif" fill="#c53030">Error: ${msg}</text>
+	const escaped = msg
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;");
+
+	return `<svg width="480" height="90" viewBox="0 0 480 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="480" height="90" rx="8" fill="#181111" stroke="#f85149" stroke-width="1.5"/>
+  <path d="M24 35L36 55H12L24 35Z" stroke="#f85149" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="50" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" font-size="13" font-weight="600" fill="#f85149">Cloudflare Analytics Widget Error</text>
+  <text x="50" y="58" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#c9d1d9">${escaped}</text>
 </svg>`;
 }
 
@@ -306,7 +331,7 @@ function parseLabel(label: string): { name: string; period: string; subtitle: st
 	return { name, period, subtitle: `${name} / ${period}` };
 }
 
-/** Generate the SVG string for the usage graph (Option 1 — Neon Terminal theme). */
+/** Generate the SVG string for the usage graph (Neon Terminal theme). */
 export function generateSvg(
 	data: RequestData[],
 	totalRequests: number,
@@ -327,7 +352,6 @@ export function generateSvg(
 	if (stats.uniques !== undefined) statParts.push(`UNIQ: ${formatNumber(stats.uniques)}`);
 	const statsLine = statParts.join(" // ");
 
-	// Y-axis labels for bar chart
 	const maxLabel = formatNumber(maxVal);
 	const minLabel = formatNumber(minVal);
 	const yAxisLabels =
@@ -402,7 +426,7 @@ export function buildAreaChart(
     <polyline points="${points}" fill="none" stroke="var(--line)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`;
 }
 
-/** Generate the SVG string for the usage graph (Minimal — sparkline area chart card). */
+/** Generate the SVG string for the usage graph (Minimal theme). */
 export function generateSvgMinimal(
 	data: RequestData[],
 	totalRequests: number,
@@ -456,7 +480,7 @@ export function generateSvgMinimal(
 </svg>`;
 }
 
-/** Build SVG horizontal bar rows from data, each row contains a day label, bar, and value. Rows scale to fit chartHeight. */
+/** Build SVG horizontal bar rows from data. Rows scale to fit chartHeight. */
 export function buildHorizontalBars(
 	data: RequestData[],
 	chartHeight: number = 119,
@@ -488,7 +512,7 @@ export function buildHorizontalBars(
 		.join("\n      ");
 }
 
-/** Generate the SVG string for the usage graph (Gradient — horizontal daily bars panel). */
+/** Generate the SVG string for the usage graph (Gradient theme). */
 export function generateSvgGradient(
 	data: RequestData[],
 	totalRequests: number,
@@ -557,7 +581,7 @@ export function generateSvgGradient(
 </svg>`;
 }
 
-/** Generate the SVG string for the usage graph (Dashboard — stat tile grid with sparkline). */
+/** Generate the SVG string for the usage graph (Dashboard theme). */
 export function generateSvgDashboard(
 	data: RequestData[],
 	totalRequests: number,
@@ -640,21 +664,23 @@ function shortPeriod(period: string): string {
 	return match ? `${match[1]}d` : "7d";
 }
 
-/** Generate the SVG string for the usage graph (Badge — shields.io-style compact pill). */
+/** Generate the SVG string for the usage graph (Badge theme with SVG bolt icon). */
 export function generateSvgBadge(
 	data: RequestData[],
 	totalRequests: number,
 	label: string = "Website Traffic (last 7 days)",
 ): string {
 	const { name, period } = parseLabel(label);
-	const labelText = `\u26a1 ${name.toLowerCase()} \u00b7 ${shortPeriod(period)}`;
+	const cleanName = `${name.toLowerCase()} \u00b7 ${shortPeriod(period)}`;
 	const valueText = formatNumber(totalRequests);
 
-	const labelWidth = Math.round(labelText.length * 6.2 + 20);
+	// Space reserved for the SVG icon (14px + margins)
+	const iconOffset = 18;
+	const labelWidth = Math.round(cleanName.length * 6.2 + iconOffset + 16);
 	const valueWidth = Math.round(valueText.length * 7.5 + 20);
 	const width = labelWidth + valueWidth;
 
-	return `<svg width="${width}" height="28" viewBox="0 0 ${width} 28" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${labelText}: ${valueText}">
+	return `<svg width="${width}" height="28" viewBox="0 0 ${width} 28" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${cleanName}: ${valueText}">
   <defs>
     <clipPath id="pill"><rect width="${width}" height="28" rx="6"/></clipPath>
   </defs>
@@ -662,16 +688,19 @@ export function generateSvgBadge(
     <rect width="${labelWidth}" height="28" fill="#2f363d"/>
     <rect x="${labelWidth}" width="${valueWidth}" height="28" fill="#F6821F"/>
   </g>
-  <g font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11" text-anchor="middle">
-    <text x="${labelWidth / 2}" y="18.5" fill="#010101" fill-opacity="0.3">${labelText}</text>
-    <text x="${labelWidth / 2}" y="17.5" fill="#ffffff">${labelText}</text>
-    <text x="${labelWidth + valueWidth / 2}" y="18.5" fill="#010101" fill-opacity="0.3" font-weight="bold">${valueText}</text>
-    <text x="${labelWidth + valueWidth / 2}" y="17.5" fill="#ffffff" font-weight="bold">${valueText}</text>
+  <g transform="translate(8, 7)">
+    <path d="M7 1L1 8H6L5 13L11 6H6L7 1Z" fill="#F6821F" stroke="#F6821F" stroke-width="0.5" stroke-linejoin="round"/>
+  </g>
+  <g font-family="Verdana,Geneva,DejaVu Sans,sans-serif" font-size="11">
+    <text x="${(labelWidth + iconOffset) / 2}" y="18.5" fill="#010101" fill-opacity="0.3" text-anchor="middle">${cleanName}</text>
+    <text x="${(labelWidth + iconOffset) / 2}" y="17.5" fill="#ffffff" text-anchor="middle">${cleanName}</text>
+    <text x="${labelWidth + valueWidth / 2}" y="18.5" fill="#010101" fill-opacity="0.3" font-weight="bold" text-anchor="middle">${valueText}</text>
+    <text x="${labelWidth + valueWidth / 2}" y="17.5" fill="#ffffff" font-weight="bold" text-anchor="middle">${valueText}</text>
   </g>
 </svg>`;
 }
 
-/** Build GitHub-contribution-style heatmap cells from daily data. Rows are weekdays (Sun–Sat), columns are weeks. */
+/** Build GitHub-contribution-style heatmap cells from daily data. */
 export function buildHeatmapCells(
 	data: RequestData[],
 	cellSize: number = 14,
@@ -695,7 +724,7 @@ export function buildHeatmapCells(
 		.join("\n      ");
 }
 
-/** Generate the SVG string for the usage graph (Heatmap — contribution-graph style). */
+/** Generate the SVG string for the usage graph (Heatmap theme). */
 export function generateSvgHeatmap(
 	data: RequestData[],
 	totalRequests: number,
@@ -761,7 +790,7 @@ export function generateSvgHeatmap(
 </svg>`;
 }
 
-/** Build candlestick-style bars (green up / red down vs. previous day) from daily values. */
+/** Build candlestick-style bars from daily values. */
 export function buildCandles(
 	values: number[],
 	chartWidth: number = 215,
@@ -792,7 +821,7 @@ export function buildCandles(
 		.join("\n      ");
 }
 
-/** Generate the SVG string for the usage graph (Ticker — stock-market candlestick style). */
+/** Generate the SVG string for the usage graph (Ticker theme). */
 export function generateSvgTicker(
 	data: RequestData[],
 	totalRequests: number,
@@ -829,13 +858,13 @@ export function generateSvgTicker(
 	const dayLetters =
 		slot >= 14
 			? data
-					.map((d, i) => {
-						const day = new Date(d.date + "T00:00:00Z").getUTCDay();
-						const letter = ["S", "M", "T", "W", "T", "F", "S"][day];
-						const cx = (slot * i + slot / 2).toFixed(1);
-						return `<text x="${cx}" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">${letter}</text>`;
-					})
-					.join("\n      ")
+				.map((d, i) => {
+					const day = new Date(d.date + "T00:00:00Z").getUTCDay();
+					const letter = ["S", "M", "T", "W", "T", "F", "S"][day];
+					const cx = (slot * i + slot / 2).toFixed(1);
+					return `<text x="${cx}" y="97" class="mono" font-size="7" fill="var(--text-s)" text-anchor="middle">${letter}</text>`;
+				})
+				.join("\n      ")
 			: "";
 
 	return `<svg width="480" height="160" viewBox="0 0 480 160" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -900,10 +929,25 @@ export function generateSvgForTheme(
 }
 
 export default {
-	async fetch(request: Request, env: Env): Promise<Response> {
+	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+		const url = new URL(request.url);
+		const isRefresh = url.searchParams.has("refresh");
+		const cacheKey = new Request(url.toString(), request);
+		const cache = caches.default;
+
+		/** Check Cloudflare Cache unless explicit refresh requested */
+		if (!isRefresh) {
+			const cachedResponse = await cache.match(cacheKey);
+			if (cachedResponse) {
+				return cachedResponse;
+			}
+		}
+
 		try {
-			const url = new URL(request.url);
-			const isRefresh = url.searchParams.has("refresh");
+			if (!env.CF_API_TOKEN) {
+				throw new Error("CF_API_TOKEN secret is not configured");
+			}
+
 			const theme = resolveTheme(url.pathname);
 			const days = parseDays(url.searchParams.get("days"));
 
@@ -917,31 +961,42 @@ export default {
 				data = await fetchWorkerEventData(env.CF_API_TOKEN, env.CF_ACCOUNT_ID, days);
 				label = `Worker Requests (last ${days} days)`;
 			} else {
-				return new Response(
-					"Error: CF_ZONE_ID or CF_ACCOUNT_ID must be set",
-					{ status: 500 },
-				);
+				throw new Error("Neither CF_ZONE_ID nor CF_ACCOUNT_ID is configured");
 			}
 
-			const totalRequests =
-				data.reduce((sum, d) => sum + d.requests, 0);
-
+			const totalRequests = data.reduce((sum, d) => sum + d.requests, 0);
 			const svg = generateSvgForTheme(theme, data, totalRequests, label);
 
-			return new Response(svg, {
+			const response = new Response(svg, {
+				status: 200,
 				headers: {
-					"Content-Type": "image/svg+xml",
+					"Content-Type": "image/svg+xml; charset=utf-8",
 					"Cache-Control": isRefresh
-						? "no-store, no-cache"
-						: "public, max-age=3600",
+						? "no-store, no-cache, must-revalidate, max-age=0"
+						: "public, max-age=3600, s-maxage=3600",
+					"Access-Control-Allow-Origin": "*",
+					"X-Content-Type-Options": "nosniff",
 				},
 			});
+
+			/** Cache valid responses asynchronously on Cloudflare Cache */
+			if (!isRefresh) {
+				ctx.waitUntil(cache.put(cacheKey, response.clone()));
+			}
+
+			return response;
 		} catch (err: unknown) {
-			const message =
-				err instanceof Error ? err.message : "Unknown error";
-			return new Response(generateErrorSvg(message), {
-				status: 500,
-				headers: { "Content-Type": "image/svg+xml" },
+			const message = err instanceof Error ? err.message : "Unknown internal error";
+			const errorSvg = generateErrorSvg(message);
+
+			return new Response(errorSvg, {
+				status: 200, // Returning 200 allows GitHub Camo to render the error card instead of a broken image
+				headers: {
+					"Content-Type": "image/svg+xml; charset=utf-8",
+					"Cache-Control": "no-store, no-cache, must-revalidate, max-age=0, s-maxage=0",
+					"Access-Control-Allow-Origin": "*",
+					"X-Content-Type-Options": "nosniff",
+				},
 			});
 		}
 	},
