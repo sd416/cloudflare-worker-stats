@@ -26,43 +26,43 @@ Choose a theme by appending the theme name to your worker URL. The default theme
 
 Vertical bar chart with a terminal/hacker aesthetic. Monospace fonts, dot grid background, glow effects.
 
-![Neon Terminal theme](https://sd-cf-worker-stats.sd-api.workers.dev/neon)
+![Neon Terminal theme](https://cloudflare-worker-stats.pluginapi.xyz/neon)
 
 ### Minimal (`/minimal`)
 
 Full-width sparkline area chart with a clean, lightweight card design. Green accent line with shaded area fill.
 
-![Minimal theme](https://sd-cf-worker-stats.sd-api.workers.dev/minimal)
+![Minimal theme](https://cloudflare-worker-stats.pluginapi.xyz/minimal)
 
 ### Gradient (`/gradient`)
 
 Horizontal daily breakdown bars with day-of-week labels and per-day request counts. Gradient background with cyan-to-purple bar fills.
 
-![Gradient theme](https://sd-cf-worker-stats.sd-api.workers.dev/gradient)
+![Gradient theme](https://cloudflare-worker-stats.pluginapi.xyz/gradient)
 
 ### Dashboard (`/dashboard`)
 
 Stat tile grid showing average requests/day, peak day, bandwidth, and unique visitors alongside the total and a sparkline.
 
-![Dashboard theme](https://sd-cf-worker-stats.sd-api.workers.dev/dashboard)
+![Dashboard theme](https://cloudflare-worker-stats.pluginapi.xyz/dashboard)
 
 ### Badge (`/badge`)
 
 Compact shields.io-style pill showing the label and total, perfect inline next to other badges.
 
-![Badge theme](https://sd-cf-worker-stats.sd-api.workers.dev/badge)
+![Badge theme](https://cloudflare-worker-stats.pluginapi.xyz/badge)
 
 ### Heatmap (`/heatmap`)
 
 GitHub contribution-graph style grid where each cell is a day, colored by traffic intensity. Pairs well with `?days=30`.
 
-![Heatmap theme](https://sd-cf-worker-stats.sd-api.workers.dev/heatmap)
+![Heatmap theme](https://cloudflare-worker-stats.pluginapi.xyz/heatmap)
 
 ### Ticker (`/ticker`)
 
 Stock-market candlestick aesthetic with green/red daily bars vs. the previous day, change %, and HI/LO/VOL stats.
 
-![Ticker theme](https://sd-cf-worker-stats.sd-api.workers.dev/ticker)
+![Ticker theme](https://cloudflare-worker-stats.pluginapi.xyz/ticker)
 
 All themes automatically adapt to **light/dark mode** via the `prefers-color-scheme` media query.
 
