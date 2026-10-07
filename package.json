@@ -5,15 +5,14 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "test": "vitest run",
+    "test": "bun test",
     "screenshots": "node scripts/generate-screenshots.mjs"
   },
   "devDependencies": {
-    "@cloudflare/vitest-pool-workers": "^0.22.0",
     "@cloudflare/workers-types": "^5.20260927.1",
-    "typescript": "^7.0.2",
-    "vitest": "~4.1.11",
+    "@types/bun": "^1.4.2",
     "esbuild": "^0.28.2",
+    "typescript": "^7.0.2",
     "wrangler": "^4.141.0"
   }
 }

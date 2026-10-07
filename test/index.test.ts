@@ -2,7 +2,7 @@ import {
 	describe,
 	it,
 	expect,
-} from "vitest";
+} from "bun:test";
 import {
 	formatNumber,
 	formatBytes,
