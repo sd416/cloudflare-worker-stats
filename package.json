@@ -9,11 +9,11 @@
     "screenshots": "node scripts/generate-screenshots.mjs"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260927.1",
+    "@cloudflare/workers-types": "^5.20261004.1",
     "@types/bun": "^1.4.2",
     "bun": "^1.4.2",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2",
-    "wrangler": "^4.141.0"
+    "wrangler": "^4.147.0"
   }
 }
