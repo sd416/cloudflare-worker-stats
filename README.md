@@ -229,7 +229,7 @@ npx wrangler secret put CF_ACCOUNT_ID
 ```bash
 npm install          # Install dependencies
 npm run dev          # Start local dev server
-npm test             # Run tests
+npm test             # Run tests (bun test, using the Bun version installed as a devDependency)
 npm run screenshots  # Regenerate theme screenshots from sample data
 npm run deploy       # Deploy to Cloudflare Workers
 ```
